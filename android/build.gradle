@@ -8,11 +8,18 @@ version '1.0'
 // Maven Central.
 apply plugin: 'com.android.library'
 
-repositories {
-    google()
-    mavenCentral()
-    flatDir {
-        dirs 'libs'
+// The native TTLock SDK is bundled as a local AAR (libs/ttlock-release.aar) and
+// is consumed transitively by the host app's runtime classpath. A local AAR in a
+// library module is NOT merged into the consumer, so the flatDir repo that
+// locates it must be visible to ALL projects (including :app) — hence the
+// rootProject.allprojects injection. The absolute path keeps it correct wherever
+// pub places this package (the pub-cache dir is commit-specific).
+def ttlockLibsDir = "${projectDir}/libs"
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        flatDir { dirs ttlockLibsDir }
     }
 }
 
